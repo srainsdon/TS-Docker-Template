@@ -1,0 +1,24 @@
+services:
+  tailscale-{hostname}:
+    image: tailscale/tailscale:latest
+    hostname: ts-{hostname}
+    environment:
+      - TS_AUTHKEY={Tailscale Auth Key}
+      - TS_STATE_DIR=/var/lib/tailscale
+    #  - TS_USERSPACE=false
+    volumes:
+      - ./tailscale-nginx/state:/var/lib/tailscale
+    #  - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    restart: unless-stopped
+    
+  {hostname}:
+    image: {Image}
+    depends_on:
+      - tailscale-{hostname}
+    network_mode: service:tailscale-dokuwiki
+    restart: unless-stopped
+    environment:
+    volumes:
